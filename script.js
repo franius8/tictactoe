@@ -1,14 +1,3 @@
-const form = document.getElementById('form');
-
-form.addEventListener('submit', function(e) {
-    e.preventDefault();
-    const player1name = document.getElementById('player1name').value;
-    const player2name = document.getElementById('player2name').value;
-    e.target.reset();
-    form.remove();
-    game.initializeGame(player1name, player2name);
-});
-
 const player = (name, marker) => {
     const selectField = (field) => {
         const index = field.getAttribute('index');
@@ -91,6 +80,42 @@ const displayController = (() => {
     const display = document.getElementById('display');
     const boardDiv = document.getElementById('board');
     const content = document.getElementById('content');   
+    
+    const buildForm = () => {
+        const form = document.createElement('form');
+        form.setAttribute('id', 'form');
+        const player1Label = document.createElement('label');
+        player1Label.setAttribute('for', 'player1name');
+        player1Label.textContent = "First player's name:"
+        const player1Input = document.createElement('input');
+        player1Input.setAttribute('id', 'player1name');
+        player1Input.setAttribute('type', 'text');
+        player1Input.setAttribute('required', 'true');
+        const player2Label = document.createElement('label');
+        player2Label.setAttribute('for', 'player2name');
+        player2Label.textContent = "Second player's name:"
+        const player2Input = document.createElement('input');
+        player2Input.setAttribute('id', 'player2name');
+        player2Input.setAttribute('type', 'text');
+        player2Input.setAttribute('required', 'true');
+        const submitButton = document.createElement('button');
+        submitButton.setAttribute('type', 'submit');
+        submitButton.textContent = 'New game';
+        form.appendChild(player1Label);
+        form.appendChild(player1Input);
+        form.appendChild(player2Label);
+        form.appendChild(player2Input);
+        form.appendChild(submitButton);
+        display.appendChild(form);
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const player1name = document.getElementById('player1name').value;
+            const player2name = document.getElementById('player2name').value;
+            e.target.reset();
+            form.remove();
+            game.initializeGame(player1name, player2name);
+        });
+    }
     const displayBoard = (board) => {
         content.style.display = 'grid';
         board.forEach((field,index) => {
@@ -167,5 +192,7 @@ const displayController = (() => {
         resetButton.textContent = "Play again"
         display.appendChild(resetButton);
     }
-    return { displayBoard, displayCurrentPlayer, displayTakenMessage, addDisplayDivs, displayWinner, displayResetButton };
+    return { displayBoard, displayCurrentPlayer, displayTakenMessage, addDisplayDivs, displayWinner, displayResetButton, buildForm };
 })();
+
+displayController.buildForm();
