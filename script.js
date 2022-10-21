@@ -24,11 +24,12 @@ const game = (() => {
     let round = 1;
 
     const initializeGame = (player1name, player2name) => {
-        playerAry = [player(player1name, 'o'), player(player2name, 'x')];
+        playerAry = [player(player1name, 'x'), player(player2name, 'o')];
         displayController.displayBoard(gameBoard.getBoard());
         displayController.addDisplayDivs();
         playGame(); 
     }
+
     const playGame = () => {
         currentPlayer = playerAry[0];
         displayController.displayCurrentPlayer(currentPlayer);
@@ -37,24 +38,54 @@ const game = (() => {
             field.addEventListener('click', function() {handleFieldSelection(field)})
         });
     }
+
     const handleFieldSelection = (field) => {
-        let isFinished = currentPlayer.selectField(field);
-        if (isFinished === true) {
-            if (gameBoard.isWon() === true) {
-                finishGame(false);
-                return;
-            } else if (round === 9) {
-                finishGame(true);
-                return;
+            let isFinished = currentPlayer.selectField(field);
+            if (isFinished === true) {
+                if (gameBoard.isWon() === true) {
+                    finishGame(false);
+                    return;
+                } else if (round === 9) {
+                    finishGame(true);
+                    return;
+                }
+                round++;
+                changeCurrentPlayer();
             }
-            round++;
-            changeCurrentPlayer();
         }
+
+    const initializePvCGame = (playerName) => {
+        playerAry = [player(playerName, 'x'), computer];
+        displayController.displayBoard(gameBoard.getBoard());
+        displayController.addDisplayDivs();
+        playPvCGame();
     }
+
+    const playPvCGame = () => {
+        currentPlayer = playerAry[0];
+        displayController.displayCurrentPlayer(currentPlayer);
+        const fields = document.querySelectorAll('.field');
+        fields.forEach(field => {
+            field.addEventListener('click', function() {handleFieldSelection(field)})
+        });
+    }
+
+    const computerSelection = () => {
+        computer.selectField('easy');
+        if (gameBoard.isWon() === true) {
+            finishGame(false);
+        }
+        round++;
+        changeCurrentPlayer();
+    }
+
     const changeCurrentPlayer = () => {
         i = Math.abs(i - 1);
         currentPlayer = playerAry[i];
         displayController.displayCurrentPlayer(currentPlayer);
+        if (currentPlayer === computer) {
+            setTimeout(function() {computerSelection()}, 1000);
+        }
     }
     const getCurrentPlayerMarker = () => {return currentPlayer.marker};
 
@@ -81,11 +112,45 @@ const game = (() => {
         displayController.displayInitialButtons();
     }
 
-    return { initializeGame, getCurrentPlayerMarker, resetGame }
+    return { initializeGame, initializePvCGame, getCurrentPlayerMarker, resetGame }
+})();
+
+const computer = (() => {
+    const name = 'computer';
+    const marker = 'o';
+    const selectField = (difficulty) => {
+        switch (difficulty) {
+            case 'easy':
+                easyFieldSelection();
+            break;
+        }
+    }
+
+    const easyFieldSelection = () => {
+        let finished = false;
+        let index = null;
+        while (finished === false) {
+            let index = Math.floor(Math.random() * 9.99);
+            console.log(index);
+            if (gameBoard.getBoard()[index] === null) {
+                placeMarker(index);
+                finished = true;
+            }
+        }
+    }
+
+    const placeMarker = (index) => {
+        const field = document.querySelector(`[index="${index}"]`);
+        gameBoard.addMarker(index, 'o');
+        const markerDiv = document.createElement('div');
+        markerDiv.classList.add('o');
+        field.appendChild(markerDiv);
+    }
+    return {name, marker, selectField};
 })();
 
 const gameBoard = (() => {
-    let board = new Array(10).fill(null);
+    let board = new Array(10).fill(null); //For simplicity 0 is not used
     const winningCombinations = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 4, 7], [2, 5, 8], [3, 6, 9], [1, 5, 9], [3, 5, 7]];
     const addMarker = (index, type) => board[index] = type;
     const isWon = () => winningCombinations.some(isPresent);
@@ -138,6 +203,13 @@ const displayController = (() => {
         form.appendChild(submitButton);
         display.appendChild(form);
         returnButton.addEventListener('click', function() {displayInitialButtons()});
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const player1name = document.getElementById('player1name').value;
+            e.target.reset();
+            form.remove();
+            game.initializePvCGame(player1name);
+        });
     }
     
     const buildFormPvP = () => {
@@ -219,6 +291,7 @@ const displayController = (() => {
         display.appendChild(currentPlayerLabel);
         display.appendChild(currentPlayerDiv);
         display.appendChild(markerDiv);
+        displayResetButton();
     }
     const displayCurrentPlayer = (player) => {
         const currentPlayerDiv = document.getElementById('currentplayerdiv');
@@ -265,7 +338,7 @@ const displayController = (() => {
     const displayResetButton = () => {
         const resetButton = document.createElement('button');
         resetButton.setAttribute('id', 'resetbutton');
-        resetButton.textContent = "Play again"
+        resetButton.textContent = "New game"
         display.appendChild(resetButton);
         resetButton.addEventListener('click', function() {game.resetGame()});
     }
