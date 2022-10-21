@@ -97,7 +97,8 @@ const game = (() => {
         }
         const fields = document.querySelectorAll('.field');
         fields.forEach(field => {
-            field.removeEventListener('click', function() {handleFieldSelection(field)})
+            const new_field = field.cloneNode(true);
+            field.parentNode.replaceChild(new_field, field);
         });
         displayController.displayResetButton();
     }
@@ -132,7 +133,7 @@ const computer = (() => {
         while (finished === false) {
             let index = Math.floor(Math.random() * 9.99);
             console.log(index);
-            if (gameBoard.getBoard()[index] === null) {
+            if (index !== 0 && gameBoard.getBoard()[index] === null) {
                 placeMarker(index);
                 finished = true;
             }
@@ -196,7 +197,7 @@ const displayController = (() => {
         player1Input.setAttribute('required', 'true');
         const submitButton = document.createElement('button');
         submitButton.setAttribute('type', 'submit');
-        submitButton.textContent = 'New game';
+        submitButton.textContent = 'New game (easy)';
         form.appendChild(returnButton);
         form.appendChild(player1Label);
         form.appendChild(player1Input);
