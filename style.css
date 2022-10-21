@@ -97,7 +97,7 @@ form input {
     letter-spacing: inherit;
 }
 
-form button {
+form button, #resetbutton {
     padding: 1rem 2rem;
     background-color: var(--top-background-color);
     border: 1px solid var(--top-background-color);
@@ -106,7 +106,7 @@ form button {
     font-size: 1.5rem;
 }
 
-form button:hover {
+form button:hover, #resetbutton:hover {
     background-color: var(--shadow-color);
     border: 1px solid var(--shadow-color);
     cursor: pointer;

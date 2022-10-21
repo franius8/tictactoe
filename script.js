@@ -50,29 +50,41 @@ const game = (() => {
     const handleFieldSelection = (field) => {
         let isFinished = currentPlayer.selectField(field);
         if (isFinished === true) {
-            console.log('a');
+            if (gameBoard.isWon() === true) {
+                finishGame();
+                return;
+            }
             changeCurrentPlayer();
         }
     }
     const changeCurrentPlayer = () => {
         i = Math.abs(i - 1);
-        console.log(i);
         currentPlayer = playerAry[i];
         displayController.displayCurrentPlayer(currentPlayer);
     }
+    const getCurrentPlayerMarker = () => {return currentPlayer.marker};
 
-    return { initializeGame, changeCurrentPlayer }
+    const finishGame = () => {
+        displayController.displayWinner(currentPlayer.name);
+        const fields = document.querySelectorAll('.field');
+        fields.forEach(field => {
+            field.removeEventListener('click', function() {handleFieldSelection(field)},)
+        });
+        displayController.displayResetButton();
+    }
+
+    return { initializeGame, getCurrentPlayerMarker }
 })();
 
 const gameBoard = (() => {
     const board = new Array(10).fill(null);
     const winningCombinations = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 4, 7], [2, 5, 8], [3, 6, 9], [1, 5, 9], [3, 5, 7]];
     const addMarker = (index, type) => board[index] = type;
-    const isWon = (marker) => board.some(isWinningCombination());
-    const isWinningCombination = (line) => line.every(isPlayerMarker);
-    const isPlayerMarker = (marker) => marker === 'x';
+    const isWon = () => winningCombinations.some(isPresent);
+    const isPresent = (line) => line.every(isPlayerMarker);
+    const isPlayerMarker = (field) => board[field] === game.getCurrentPlayerMarker();
 
-    return {board, addMarker, isWon}
+    return {board, addMarker, isWon, isPresent}
 })();
 
 const displayController = (() => {
@@ -137,5 +149,23 @@ const displayController = (() => {
         errorDiv.textContent = '';
         errorDiv.style.visibility = 'collapse';
     }
-    return { displayBoard, displayCurrentPlayer, displayTakenMessage, addDisplayDivs };
+
+    const clearDisplay = () => {
+        display.textContent = ''
+    }
+
+    const displayWinner = (name) => {
+        clearDisplay();
+        const winnerDiv = document.createElement('div');
+        winnerDiv.textContent = `${name} won!`;
+        winnerDiv.classList.add('winnerdiv');
+        display.appendChild(winnerDiv);
+    }
+    const displayResetButton = () => {
+        const resetButton = document.createElement('button');
+        resetButton.setAttribute('id', 'resetbutton');
+        resetButton.textContent = "Play again"
+        display.appendChild(resetButton);
+    }
+    return { displayBoard, displayCurrentPlayer, displayTakenMessage, addDisplayDivs, displayWinner, displayResetButton };
 })();
