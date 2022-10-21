@@ -78,7 +78,7 @@ const game = (() => {
         round = 1;
         gameBoard.resetBoard(); 
         displayController.hideBoard();
-        displayController.buildForm();
+        displayController.displayInitialButtons();
     }
 
     return { initializeGame, getCurrentPlayerMarker, resetGame }
@@ -101,8 +101,49 @@ const displayController = (() => {
     const boardDiv = document.getElementById('board');
     const content = document.getElementById('content');   
     
-    const buildForm = () => {
+    const displayInitialButtons = () => {
         clearDisplay();
+        const computerButton = document.createElement('button');
+        const middleDiv = document.createElement('div');
+        const playerButtton = document.createElement('button');
+        computerButton.textContent = 'Player vs Computer';
+        middleDiv.textContent = 'or';
+        playerButtton.textContent = 'Player vs Player';
+        display.appendChild(computerButton);
+        display.appendChild(middleDiv);
+        display.appendChild(playerButtton);
+        computerButton.addEventListener('click', function () {buildFormPvC()});
+        playerButtton.addEventListener('click', function () {buildFormPvP()});
+    }
+    
+    const buildFormPvC = () => {
+        clearDisplay();
+        const returnButton = document.createElement('button');
+        returnButton.textContent = '\u2190 Return'
+        const form = document.createElement('form');
+        form.setAttribute('id', 'form');
+        const player1Label = document.createElement('label');
+        player1Label.setAttribute('for', 'player1name');
+        player1Label.textContent = "First player's name:"
+        const player1Input = document.createElement('input');
+        player1Input.setAttribute('id', 'player1name');
+        player1Input.setAttribute('type', 'text');
+        player1Input.setAttribute('required', 'true');
+        const submitButton = document.createElement('button');
+        submitButton.setAttribute('type', 'submit');
+        submitButton.textContent = 'New game';
+        form.appendChild(returnButton);
+        form.appendChild(player1Label);
+        form.appendChild(player1Input);
+        form.appendChild(submitButton);
+        display.appendChild(form);
+        returnButton.addEventListener('click', function() {displayInitialButtons()});
+    }
+    
+    const buildFormPvP = () => {
+        clearDisplay();
+        const returnButton = document.createElement('button');
+        returnButton.textContent = '\u2190 Return'
         const form = document.createElement('form');
         form.setAttribute('id', 'form');
         const player1Label = document.createElement('label');
@@ -122,12 +163,14 @@ const displayController = (() => {
         const submitButton = document.createElement('button');
         submitButton.setAttribute('type', 'submit');
         submitButton.textContent = 'New game';
+        form.appendChild(returnButton);
         form.appendChild(player1Label);
         form.appendChild(player1Input);
         form.appendChild(player2Label);
         form.appendChild(player2Input);
         form.appendChild(submitButton);
         display.appendChild(form);
+        returnButton.addEventListener('click', function() {displayInitialButtons()});
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             const player1name = document.getElementById('player1name').value;
@@ -227,7 +270,8 @@ const displayController = (() => {
         resetButton.addEventListener('click', function() {game.resetGame()});
     }
     return { displayBoard, displayCurrentPlayer, displayTakenMessage, 
-        addDisplayDivs, displayWinner, displayResetButton, buildForm, hideBoard, displayTieMessage };
+        addDisplayDivs, displayWinner, displayResetButton, 
+        hideBoard, displayTieMessage, displayInitialButtons };
 })();
 
-displayController.buildForm();
+displayController.displayInitialButtons();
