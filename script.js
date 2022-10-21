@@ -41,7 +41,7 @@ const game = (() => {
     }
     const playGame = () => {
         currentPlayer = playerAry[0];
-        displayController.displayCurrentPlayer(currentPlayer.name);
+        displayController.displayCurrentPlayer(currentPlayer);
         const fields = document.querySelectorAll('.field');
         fields.forEach(field => {
             field.addEventListener('click', function() {handleFieldSelection(field)},)
@@ -58,7 +58,7 @@ const game = (() => {
         i = Math.abs(i - 1);
         console.log(i);
         currentPlayer = playerAry[i];
-        displayController.displayCurrentPlayer(currentPlayer.name);
+        displayController.displayCurrentPlayer(currentPlayer);
     }
 
     return { initializeGame, changeCurrentPlayer }
@@ -77,8 +77,10 @@ const gameBoard = (() => {
 
 const displayController = (() => {
     const display = document.getElementById('display');
-    const boardDiv = document.getElementById('board');    
+    const boardDiv = document.getElementById('board');
+    const content = document.getElementById('content');   
     const displayBoard = (board) => {
+        content.style.display = 'grid';
         board.forEach((field,index) => {
             const fieldDiv = document.createElement('div');
             fieldDiv.classList.add('field');
@@ -95,22 +97,45 @@ const displayController = (() => {
             }
             boardDiv.appendChild(fieldDiv);
         });
+        boardDiv.style.display = 'grid';
     };
     const addDisplayDivs = () => {
         const errorDiv = document.createElement('div');
         errorDiv.setAttribute('id', 'errordiv');
         const currentPlayerDiv = document.createElement('div');
         currentPlayerDiv.setAttribute('id', 'currentplayerdiv');
+        const currentPlayerLabel = document.createElement('div');
+        currentPlayerLabel.setAttribute('id', 'currentplayerlabel');
+        currentPlayerLabel.textContent = 'Current player:';
+        const markerDiv = document.createElement('div');
+        markerDiv.setAttribute('id', 'markerdiv')
         display.appendChild(errorDiv);
+        display.appendChild(currentPlayerLabel);
         display.appendChild(currentPlayerDiv);
+        display.appendChild(markerDiv);
     }
-    const displayCurrentPlayer = (playerName) => {
+    const displayCurrentPlayer = (player) => {
         const currentPlayerDiv = document.getElementById('currentplayerdiv');
-        currentPlayerDiv.textContent = `${playerName}'s turn.`;
+        currentPlayerDiv.textContent = player.name;
+        displayMarker(player);
+        clearErrorMessage();
     }
     const displayTakenMessage = () => {
-        const errorDiv = document.createElement('div');
-        errorDiv.textContent = 'Space already taken.';
+        const errorDiv = document.getElementById('errordiv');
+        errorDiv.textContent = 'Space already taken';
+        errorDiv.style.visibility = 'visible';
+    }
+    const displayMarker = (player) => {
+        const markerDiv = document.getElementById('markerdiv');
+        const markerElement = document.createElement('div');
+        markerDiv.innerHTML = '';
+        markerElement.classList.add(player.marker);
+        markerDiv.appendChild(markerElement);
+    }
+    const clearErrorMessage = () => {
+        const errorDiv = document.getElementById('errordiv');
+        errorDiv.textContent = '';
+        errorDiv.style.visibility = 'collapse';
     }
     return { displayBoard, displayCurrentPlayer, displayTakenMessage, addDisplayDivs };
 })();
