@@ -1,12 +1,4 @@
 const form = document.getElementById('form');
-const display = document.getElementById('display');
-
-document.addEventListener('click', function(e) {
-    if (e.target && e.target.className === 'field') {
-      const player1 = player('test', 'o');
-        player1.selectField(e.target);  
-    }
-});
 
 form.addEventListener('submit', function(e) {
     e.preventDefault();
@@ -14,45 +6,62 @@ form.addEventListener('submit', function(e) {
     const player2name = document.getElementById('player2name').value;
     e.target.reset();
     form.remove();
-    game.playGame(player1name, player2name);
+    game.initializeGame(player1name, player2name);
 });
 
 const player = (name, marker) => {
     const selectField = (field) => {
         const index = field.getAttribute('index');
-        console.log(index);
-        if (gameBoard.board[index] === null) {
-            gameBoard.board[index] = marker;
-            const markerDiv = document.createElement('div');
-            markerDiv.classList.add(marker);
-            field.appendChild(markerDiv);
-        } else {
-            displayController.displayTakenMessage();
-        };
+            if (gameBoard.board[index] === null) {
+                gameBoard.addMarker(index, marker);
+                placeMarker(field);
+                return true;
+            } else {
+                displayController.displayTakenMessage();
+            };    
+        }
+    const placeMarker = (field) => {
+        const markerDiv = document.createElement('div');
+        markerDiv.classList.add(marker);
+        field.appendChild(markerDiv);
     }
     return { name, marker, selectField };
-}
+};
 
 const game = (() => {
-    let currentPlayer;
     let i = 0;
-    const playGame = (player1name, player2name) => {
-        const player1 = player(player1name, 'o');
-        const player2 = player(player2name, 'x');
-        const playerAry = [player1, player2];
-        setCurrentPlayer(playerAry);
-        console.log(currentPlayer);
+    let currentPlayer = null;
+    let playerAry = null;
+
+    const initializeGame = (player1name, player2name) => {
+        playerAry = [player(player1name, 'o'), player(player2name, 'x')];
         displayController.displayBoard(gameBoard.board);
-        displayController.displayCurrentPlayer(currentPlayer.name);  
+        displayController.addDisplayDivs();
+        playGame(); 
     }
-    const changeCurrentPlayer = (playerAry) => {
+    const playGame = () => {
+        currentPlayer = playerAry[0];
+        displayController.displayCurrentPlayer(currentPlayer.name);
+        const fields = document.querySelectorAll('.field');
+        fields.forEach(field => {
+            field.addEventListener('click', function() {handleFieldSelection(field)},)
+        });
+    }
+    const handleFieldSelection = (field) => {
+        let isFinished = currentPlayer.selectField(field);
+        if (isFinished === true) {
+            console.log('a');
+            changeCurrentPlayer();
+        }
+    }
+    const changeCurrentPlayer = () => {
         i = Math.abs(i - 1);
+        console.log(i);
         currentPlayer = playerAry[i];
+        displayController.displayCurrentPlayer(currentPlayer.name);
     }
-    const setCurrentPlayer = (playerAry) => {
-        currentPlayer = playerAry[i];
-    }
-    return { playGame, changeCurrentPlayer, currentPlayer }
+
+    return { initializeGame, changeCurrentPlayer }
 })();
 
 const gameBoard = (() => {
@@ -67,6 +76,7 @@ const gameBoard = (() => {
 })();
 
 const displayController = (() => {
+    const display = document.getElementById('display');
     const boardDiv = document.getElementById('board');    
     const displayBoard = (board) => {
         board.forEach((field,index) => {
@@ -86,15 +96,21 @@ const displayController = (() => {
             boardDiv.appendChild(fieldDiv);
         });
     };
+    const addDisplayDivs = () => {
+        const errorDiv = document.createElement('div');
+        errorDiv.setAttribute('id', 'errordiv');
+        const currentPlayerDiv = document.createElement('div');
+        currentPlayerDiv.setAttribute('id', 'currentplayerdiv');
+        display.appendChild(errorDiv);
+        display.appendChild(currentPlayerDiv);
+    }
     const displayCurrentPlayer = (playerName) => {
-        const messageDiv = document.createElement('div');
-        messageDiv.textContent = `${playerName}'s turn.`;
-        display.appendChild(messageDiv);
+        const currentPlayerDiv = document.getElementById('currentplayerdiv');
+        currentPlayerDiv.textContent = `${playerName}'s turn.`;
     }
     const displayTakenMessage = () => {
-        const messageDiv = document.createElement('div');
-        messageDiv.textContent = 'Space already taken.';
-        display.appendChild(messageDiv);
+        const errorDiv = document.createElement('div');
+        errorDiv.textContent = 'Space already taken.';
     }
-    return { displayBoard, displayCurrentPlayer, displayTakenMessage };
+    return { displayBoard, displayCurrentPlayer, displayTakenMessage, addDisplayDivs };
 })();
