@@ -1,7 +1,7 @@
 const player = (name, marker) => {
     const selectField = (field) => {
         const index = field.getAttribute('index');
-            if (gameBoard.board[index] === null) {
+            if (gameBoard.getBoard()[index] === null) {
                 gameBoard.addMarker(index, marker);
                 placeMarker(field);
                 return true;
@@ -21,10 +21,11 @@ const game = (() => {
     let i = 0;
     let currentPlayer = null;
     let playerAry = null;
+    let round = 1;
 
     const initializeGame = (player1name, player2name) => {
         playerAry = [player(player1name, 'o'), player(player2name, 'x')];
-        displayController.displayBoard(gameBoard.board);
+        displayController.displayBoard(gameBoard.getBoard());
         displayController.addDisplayDivs();
         playGame(); 
     }
@@ -33,16 +34,20 @@ const game = (() => {
         displayController.displayCurrentPlayer(currentPlayer);
         const fields = document.querySelectorAll('.field');
         fields.forEach(field => {
-            field.addEventListener('click', function() {handleFieldSelection(field)},)
+            field.addEventListener('click', function() {handleFieldSelection(field)})
         });
     }
     const handleFieldSelection = (field) => {
         let isFinished = currentPlayer.selectField(field);
         if (isFinished === true) {
             if (gameBoard.isWon() === true) {
-                finishGame();
+                finishGame(false);
+                return;
+            } else if (round === 9) {
+                finishGame(true);
                 return;
             }
+            round++;
             changeCurrentPlayer();
         }
     }
@@ -53,27 +58,42 @@ const game = (() => {
     }
     const getCurrentPlayerMarker = () => {return currentPlayer.marker};
 
-    const finishGame = () => {
-        displayController.displayWinner(currentPlayer.name);
+    const finishGame = (tie) => {
+        if (tie) {
+            displayController.displayTieMessage();
+        } else {
+            displayController.displayWinner(currentPlayer.name);   
+        }
         const fields = document.querySelectorAll('.field');
         fields.forEach(field => {
-            field.removeEventListener('click', function() {handleFieldSelection(field)},)
+            field.removeEventListener('click', function() {handleFieldSelection(field)})
         });
         displayController.displayResetButton();
     }
+    
+    const resetGame = () => {
+        i = 0;
+        currentPlayer = null;
+        playerAry = null;
+        round = 1;
+        gameBoard.resetBoard(); 
+        displayController.hideBoard();
+        displayController.buildForm();
+    }
 
-    return { initializeGame, getCurrentPlayerMarker }
+    return { initializeGame, getCurrentPlayerMarker, resetGame }
 })();
 
 const gameBoard = (() => {
-    const board = new Array(10).fill(null);
+    let board = new Array(10).fill(null);
     const winningCombinations = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 4, 7], [2, 5, 8], [3, 6, 9], [1, 5, 9], [3, 5, 7]];
     const addMarker = (index, type) => board[index] = type;
     const isWon = () => winningCombinations.some(isPresent);
     const isPresent = (line) => line.every(isPlayerMarker);
     const isPlayerMarker = (field) => board[field] === game.getCurrentPlayerMarker();
-
-    return {board, addMarker, isWon, isPresent}
+    const resetBoard = () => {board = new Array(10).fill(null)}
+    const getBoard = () => {return board}
+    return {getBoard, addMarker, isWon, isPresent, resetBoard}
 })();
 
 const displayController = (() => {
@@ -82,6 +102,7 @@ const displayController = (() => {
     const content = document.getElementById('content');   
     
     const buildForm = () => {
+        clearDisplay();
         const form = document.createElement('form');
         form.setAttribute('id', 'form');
         const player1Label = document.createElement('label');
@@ -136,6 +157,11 @@ const displayController = (() => {
         });
         boardDiv.style.display = 'grid';
     };
+    const hideBoard = () => {
+        content.style.display = 'flex';
+        boardDiv.textContent = '';
+        boardDiv.style.display = 'none';
+    }
     const addDisplayDivs = () => {
         const errorDiv = document.createElement('div');
         errorDiv.setAttribute('id', 'errordiv');
@@ -186,13 +212,22 @@ const displayController = (() => {
         winnerDiv.classList.add('winnerdiv');
         display.appendChild(winnerDiv);
     }
+    const displayTieMessage = () => {
+        clearDisplay();
+        const tieDiv = document.createElement('div');
+        tieDiv.textContent = 'Tie';
+        tieDiv.classList.add('winnerdiv');
+        display.appendChild(tieDiv);
+    }
     const displayResetButton = () => {
         const resetButton = document.createElement('button');
         resetButton.setAttribute('id', 'resetbutton');
         resetButton.textContent = "Play again"
         display.appendChild(resetButton);
+        resetButton.addEventListener('click', function() {game.resetGame()});
     }
-    return { displayBoard, displayCurrentPlayer, displayTakenMessage, addDisplayDivs, displayWinner, displayResetButton, buildForm };
+    return { displayBoard, displayCurrentPlayer, displayTakenMessage, 
+        addDisplayDivs, displayWinner, displayResetButton, buildForm, hideBoard, displayTieMessage };
 })();
 
 displayController.buildForm();
