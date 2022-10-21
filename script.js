@@ -2,8 +2,10 @@ const form = document.getElementById('form');
 const display = document.getElementById('display');
 
 document.addEventListener('click', function(e) {
-    if (e.target && e.target.className === 'field')
-    console.log(e.target.getAttribute('index'));
+    if (e.target && e.target.className === 'field') {
+      const player1 = player('test', 'o');
+        player1.selectField(e.target);  
+    }
 });
 
 form.addEventListener('submit', function(e) {
@@ -18,29 +20,39 @@ form.addEventListener('submit', function(e) {
 const player = (name, marker) => {
     const selectField = (field) => {
         const index = field.getAttribute('index');
+        console.log(index);
         if (gameBoard.board[index] === null) {
             gameBoard.board[index] = marker;
-            field.classList.add(marker);
-        }
+            const markerDiv = document.createElement('div');
+            markerDiv.classList.add(marker);
+            field.appendChild(markerDiv);
+        } else {
+            displayController.displayTakenMessage();
+        };
     }
     return { name, marker, selectField };
 }
 
 const game = (() => {
+    let currentPlayer;
+    let i = 0;
     const playGame = (player1name, player2name) => {
         const player1 = player(player1name, 'o');
         const player2 = player(player2name, 'x');
         const playerAry = [player1, player2];
-        let i = 0
-        while (true) {
-        let currentPlayer = playerAry[i];
+        setCurrentPlayer(playerAry);
+        console.log(currentPlayer);
         displayController.displayBoard(gameBoard.board);
-        displayController.displayCurrentPlayer(currentPlayer.name);
-        currentPlayer.selectField();
-        i = Math.abs(i - 1);    
-        }
+        displayController.displayCurrentPlayer(currentPlayer.name);  
     }
-    return { playGame }
+    const changeCurrentPlayer = (playerAry) => {
+        i = Math.abs(i - 1);
+        currentPlayer = playerAry[i];
+    }
+    const setCurrentPlayer = (playerAry) => {
+        currentPlayer = playerAry[i];
+    }
+    return { playGame, changeCurrentPlayer, currentPlayer }
 })();
 
 const gameBoard = (() => {
@@ -79,5 +91,10 @@ const displayController = (() => {
         messageDiv.textContent = `${playerName}'s turn.`;
         display.appendChild(messageDiv);
     }
-    return { displayBoard, displayCurrentPlayer };
+    const displayTakenMessage = () => {
+        const messageDiv = document.createElement('div');
+        messageDiv.textContent = 'Space already taken.';
+        display.appendChild(messageDiv);
+    }
+    return { displayBoard, displayCurrentPlayer, displayTakenMessage };
 })();
