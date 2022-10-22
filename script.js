@@ -22,6 +22,7 @@ const game = (() => {
     let currentPlayer = null;
     let playerAry = null;
     let round = 1;
+    let difficulty = null;
 
     const initializeGame = (player1name, player2name) => {
         playerAry = [player(player1name, 'x'), player(player2name, 'o')];
@@ -54,8 +55,9 @@ const game = (() => {
             }
         }
 
-    const initializePvCGame = (playerName) => {
+    const initializePvCGame = (playerName, difficultyLevel) => {
         playerAry = [player(playerName, 'x'), computer];
+        difficulty = difficultyLevel;
         displayController.displayBoard(gameBoard.getBoard());
         displayController.addDisplayDivs();
         playPvCGame();
@@ -71,7 +73,7 @@ const game = (() => {
     }
 
     const computerSelection = () => {
-        computer.selectField('easy');
+        computer.selectField(difficulty);
         if (gameBoard.isWon() === true) {
             finishGame(false);
         }
@@ -132,7 +134,6 @@ const computer = (() => {
         let index = null;
         while (finished === false) {
             let index = Math.floor(Math.random() * 9.99);
-            console.log(index);
             if (index !== 0 && gameBoard.getBoard()[index] === null) {
                 placeMarker(index);
                 finished = true;
@@ -190,26 +191,56 @@ const displayController = (() => {
         form.setAttribute('id', 'form');
         const player1Label = document.createElement('label');
         player1Label.setAttribute('for', 'player1name');
-        player1Label.textContent = "First player's name:"
+        player1Label.textContent = "First player's name:";
         const player1Input = document.createElement('input');
         player1Input.setAttribute('id', 'player1name');
         player1Input.setAttribute('type', 'text');
         player1Input.setAttribute('required', 'true');
+        const difficultyLabel = document.createElement('label');
+        difficultyLabel.setAttribute('for', 'radiocontainer');
+        difficultyLabel.textContent = "Select difficulty:";
+        const radioContainer = document.createElement('div');
+        radioContainer.setAttribute('id', 'radiocontainer');
+        const difficultyLevelEasyLabel = document.createElement('label');
+        difficultyLevelEasyLabel.setAttribute('for', 'difficultyleveleasy');
+        difficultyLevelEasyLabel.textContent = "Easy";
+        const difficultyLevelEasy = document.createElement('input');
+        difficultyLevelEasy.setAttribute('id', 'difficultyleveleasy');
+        difficultyLevelEasy.setAttribute('type', 'radio');
+        difficultyLevelEasy.setAttribute('value', 'easy');
+        difficultyLevelEasy.setAttribute('required', 'true');
+        difficultyLevelEasy.setAttribute('name', 'difficulty');
+        const difficultyLevelStandardLabel = document.createElement('label');
+        difficultyLevelStandardLabel.setAttribute('for', 'difficultylevelstandard');
+        difficultyLevelStandardLabel.textContent = "Standard"
+        const difficultyLevelStandard = document.createElement('input');
+        difficultyLevelStandard.setAttribute('id', 'difficultylevelstandard');
+        difficultyLevelStandard.setAttribute('type', 'radio');
+        difficultyLevelStandard.setAttribute('value', 'easy');
+        difficultyLevelStandard.setAttribute('required', 'true');
+        difficultyLevelStandard.setAttribute('name', 'difficulty');
         const submitButton = document.createElement('button');
         submitButton.setAttribute('type', 'submit');
-        submitButton.textContent = 'New game (easy)';
+        submitButton.textContent = 'New game';
+        radioContainer.appendChild(difficultyLevelEasy);
+        radioContainer.appendChild(difficultyLevelEasyLabel);
+        radioContainer.appendChild(difficultyLevelStandard);
+        radioContainer.appendChild(difficultyLevelStandardLabel);
         form.appendChild(returnButton);
         form.appendChild(player1Label);
         form.appendChild(player1Input);
+        form.appendChild(difficultyLabel);
+        form.appendChild(radioContainer);
         form.appendChild(submitButton);
         display.appendChild(form);
         returnButton.addEventListener('click', function() {displayInitialButtons()});
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             const player1name = document.getElementById('player1name').value;
+            const difficultyLevel = document.querySelector('input[name="difficulty"]:checked').value;
             e.target.reset();
             form.remove();
-            game.initializePvCGame(player1name);
+            game.initializePvCGame(player1name, difficultyLevel);
         });
     }
     
