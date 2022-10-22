@@ -121,23 +121,103 @@ const game = (() => {
 const computer = (() => {
     const name = 'computer';
     const marker = 'o';
+    const center = 5;
+    const corners = [1, 3, 7, 9];
+    const sides = [2, 4, 6, 8];
+    let winningMoveIndex = null;
+    let blockMoveIndex = null;
+
     const selectField = (difficulty) => {
+        console.log(difficulty);
         switch (difficulty) {
             case 'easy':
                 easyFieldSelection();
-            break;
+                break;
+            case 'standard':
+                standardFieldSelection();
+                break;
         }
     }
 
     const easyFieldSelection = () => {
         let finished = false;
-        let index = null;
         while (finished === false) {
             let index = Math.floor(Math.random() * 9.99);
             if (index !== 0 && gameBoard.getBoard()[index] === null) {
                 placeMarker(index);
                 finished = true;
-            }
+            };
+        };
+    };
+
+    const standardFieldSelection = () => {
+        if (checkWinningMoves()) {
+            placeMarker(winningMoveIndex);
+        } else if (checkBlocks()) {
+            placeMarker(blockMoveIndex);
+        } else if (gameBoard.getBoard()[center] === null) {
+            placeMarker(center);
+        } else {
+            easyFieldSelection();
+        }
+    }
+
+    const checkWinningMoves = () => {
+        let winningIndex = null;
+        gameBoard.winningCombinations.forEach(line => {
+            let computerMarkers = 0;
+            let nullMarkers = 0;
+            let nullIndex = null
+            line.forEach(field => {
+                switch (gameBoard.getBoard()[field]) {
+                    case 'o':
+                        computerMarkers++;
+                        break;
+                    case null:
+                        nullMarkers++;
+                        nullIndex = field
+                        break;
+                };
+            });
+            if (computerMarkers === 2 && nullMarkers === 1) {
+                winningIndex = nullIndex
+            };
+        });
+        if (winningIndex !== null) {
+            winningMoveIndex = winningIndex;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    const checkBlocks = () => {
+        let blockIndex = null;
+        gameBoard.winningCombinations.forEach(line => {
+            let playerMarkers = 0;
+            let nullMarkers = 0;
+            let nullIndex = null;
+            line.forEach(field => {
+                switch (gameBoard.getBoard()[field]) {
+                    case 'x':
+                        playerMarkers++;
+                        break;
+                    case null:
+                        nullMarkers++;
+                        nullIndex = field;
+                        break;
+                };
+            });
+            console.log(playerMarkers + nullMarkers);
+            if (playerMarkers === 2 && nullMarkers === 1) {
+                blockIndex = nullIndex;
+            };
+        });
+        if (blockIndex !== null) {
+            blockMoveIndex = blockIndex;
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -160,7 +240,7 @@ const gameBoard = (() => {
     const isPlayerMarker = (field) => board[field] === game.getCurrentPlayerMarker();
     const resetBoard = () => {board = new Array(10).fill(null)}
     const getBoard = () => {return board}
-    return {getBoard, addMarker, isWon, isPresent, resetBoard}
+    return {winningCombinations, getBoard, addMarker, isWon, isPresent, resetBoard}
 })();
 
 const displayController = (() => {
@@ -216,7 +296,7 @@ const displayController = (() => {
         const difficultyLevelStandard = document.createElement('input');
         difficultyLevelStandard.setAttribute('id', 'difficultylevelstandard');
         difficultyLevelStandard.setAttribute('type', 'radio');
-        difficultyLevelStandard.setAttribute('value', 'easy');
+        difficultyLevelStandard.setAttribute('value', 'standard');
         difficultyLevelStandard.setAttribute('required', 'true');
         difficultyLevelStandard.setAttribute('name', 'difficulty');
         const submitButton = document.createElement('button');
@@ -238,6 +318,7 @@ const displayController = (() => {
             e.preventDefault();
             const player1name = document.getElementById('player1name').value;
             const difficultyLevel = document.querySelector('input[name="difficulty"]:checked').value;
+            console.log(difficultyLevel);
             e.target.reset();
             form.remove();
             game.initializePvCGame(player1name, difficultyLevel);
