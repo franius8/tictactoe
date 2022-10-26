@@ -8,6 +8,7 @@ const player = (name, marker) => {
             return true;
         }
         displayController.displayTakenMessage();
+        return false;
     };
     const placeMarker = (field) => {
         const markerDiv = document.createElement('div');
