@@ -1,5 +1,3 @@
-"use strict";
-
 const player = (name: string, marker: string) => {
   const selectField = (field: HTMLElement) => {
     const index = parseInt(field.getAttribute('index'));
