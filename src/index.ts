@@ -1,6 +1,6 @@
-const player = (name, marker) => {
-  const selectField = (field) => {
-    const index = field.getAttribute('index');
+const player = (name: string, marker: string) => {
+  const selectField = (field: HTMLElement) => {
+    const index = parseInt(field.getAttribute('index'));
     if (gameBoard.getBoard()[index] === null) {
       gameBoard.addMarker(index, marker);
       placeMarker(field);
@@ -8,7 +8,7 @@ const player = (name, marker) => {
     }
     displayController.displayTakenMessage();
   };
-  const placeMarker = (field) => {
+  const placeMarker = (field: HTMLElement) => {
     const markerDiv = document.createElement('div');
     markerDiv.classList.add(marker);
     field.appendChild(markerDiv);
@@ -23,7 +23,7 @@ const game = (() => {
   let round = 1;
   let difficulty = null;
 
-  const initializeGame = (player1name, player2name) => {
+  const initializeGame = (player1name: string, player2name: string) => {
     playerAry = [player(player1name, 'x'), player(player2name, 'o')];
     displayController.displayBoard(gameBoard.getBoard());
     displayController.addDisplayDivs();
@@ -34,12 +34,12 @@ const game = (() => {
     currentPlayer = playerAry[0];
     displayController.displayCurrentPlayer(currentPlayer);
     const fields = document.querySelectorAll('.field');
-    fields.forEach((field) => {
+    fields.forEach((field: HTMLElement) => {
       field.addEventListener('click', () => { handleFieldSelection(field); });
     });
   };
 
-  const handleFieldSelection = (field) => {
+  const handleFieldSelection = (field: HTMLElement) => {
     const isFinished = currentPlayer.selectField(field);
     if (isFinished === true) {
       if (gameBoard.isWon() === true) {
@@ -54,7 +54,7 @@ const game = (() => {
     }
   };
 
-  const initializePvCGame = (playerName, difficultyLevel) => {
+  const initializePvCGame = (playerName: string, difficultyLevel: string) => {
     playerAry = [player(playerName, 'x'), computer];
     difficulty = difficultyLevel;
     displayController.displayBoard(gameBoard.getBoard());
@@ -66,7 +66,7 @@ const game = (() => {
     currentPlayer = playerAry[0];
     displayController.displayCurrentPlayer(currentPlayer);
     const fields = document.querySelectorAll('.field');
-    fields.forEach((field) => {
+    fields.forEach((field: HTMLElement) => {
       field.addEventListener('click', () => { handleFieldSelection(field); });
     });
   };
@@ -90,7 +90,7 @@ const game = (() => {
   };
   const getCurrentPlayerMarker = () => currentPlayer.marker;
 
-  const finishGame = (tie) => {
+  const finishGame = (tie: boolean) => {
     if (tie) {
       displayController.displayTieMessage();
     } else {
@@ -128,7 +128,7 @@ const computer = (() => {
   let winningMoveIndex = null;
   let blockMoveIndex = null;
 
-  const selectField = (difficulty) => {
+  const selectField = (difficulty: string) => {
     switch (difficulty) {
       case 'easy':
         easyFieldSelection();
@@ -222,7 +222,7 @@ const computer = (() => {
     return false;
   };
 
-  const placeMarker = (index) => {
+  const placeMarker = (index: number) => {
     const field = document.querySelector(`[index="${index}"]`);
     gameBoard.addMarker(index, 'o');
     const markerDiv = document.createElement('div');
@@ -235,10 +235,10 @@ const computer = (() => {
 const gameBoard = (() => {
   let board = new Array(10).fill(null); // For simplicity 0 is not used
   const winningCombinations = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 4, 7], [2, 5, 8], [3, 6, 9], [1, 5, 9], [3, 5, 7]];
-  const addMarker = (index, type) => board[index] = type;
+  const addMarker = (index: number, type: string) => board[index] = type;
   const isWon = () => winningCombinations.some(isPresent);
-  const isPresent = (line) => line.every(isPlayerMarker);
-  const isPlayerMarker = (field) => board[field] === game.getCurrentPlayerMarker();
+  const isPresent = (line: number[]) => line.every(isPlayerMarker);
+  const isPlayerMarker = (field: number) => board[field] === game.getCurrentPlayerMarker();
   const resetBoard = () => { board = new Array(10).fill(null); };
   const getBoard = () => board;
   return {
@@ -319,9 +319,10 @@ const displayController = (() => {
     returnButton.addEventListener('click', () => { displayInitialButtons(); });
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      const player1name = document.getElementById('player1name').value;
-      const difficultyLevel = document.querySelector('input[name="difficulty"]:checked').value;
-      e.target.reset();
+      const player1name = (document.getElementById('player1name') as HTMLInputElement).value;
+      const difficultyLevel = (document.querySelector('input[name="difficulty"]:checked') as HTMLInputElement).value;
+      const target = e.target as HTMLFormElement;
+      target.reset();
       form.remove();
       game.initializePvCGame(player1name, difficultyLevel);
     });
@@ -360,19 +361,20 @@ const displayController = (() => {
     returnButton.addEventListener('click', () => { displayInitialButtons(); });
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      const player1name = document.getElementById('player1name').value;
-      const player2name = document.getElementById('player2name').value;
-      e.target.reset();
+      const player1name = (document.getElementById('player1name') as HTMLInputElement).value;
+      const player2name = (document.getElementById('player2name') as HTMLInputElement).value;
+      const target = e.target as HTMLFormElement;
+      target.reset();
       form.remove();
       game.initializeGame(player1name, player2name);
     });
   };
-  const displayBoard = (board) => {
+  const displayBoard = (board: any[]) => {
     content.style.display = 'grid';
     board.forEach((field, index) => {
       const fieldDiv = document.createElement('div');
       fieldDiv.classList.add('field');
-      fieldDiv.setAttribute('index', index);
+      fieldDiv.setAttribute('index', index.toString());
       if (index === 0) { return; }
       if (field === 'x') {
         const divX = document.createElement('div');
@@ -408,7 +410,7 @@ const displayController = (() => {
     display.appendChild(markerDiv);
     displayResetButton();
   };
-  const displayCurrentPlayer = (currentPlayer) => {
+  const displayCurrentPlayer = (currentPlayer: { name: string; marker: string; }) => {
     const currentPlayerDiv = document.getElementById('currentplayerdiv');
     currentPlayerDiv.textContent = currentPlayer.name;
     displayMarker(currentPlayer);
@@ -419,7 +421,7 @@ const displayController = (() => {
     errorDiv.textContent = 'Space already taken';
     errorDiv.style.visibility = 'visible';
   };
-  const displayMarker = (currentPlayer) => {
+  const displayMarker = (currentPlayer: { name: string; marker: string; }) => {
     const markerDiv = document.getElementById('markerdiv');
     const markerElement = document.createElement('div');
     markerDiv.innerHTML = '';
@@ -436,7 +438,7 @@ const displayController = (() => {
     display.textContent = '';
   };
 
-  const displayWinner = (name) => {
+  const displayWinner = (name: string) => {
     clearDisplay();
     const winnerDiv = document.createElement('div');
     winnerDiv.textContent = `${name} won!`;
