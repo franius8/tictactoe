@@ -1,3 +1,4 @@
+"use strict";
 const player = (name, marker) => {
     const selectField = (field) => {
         const index = parseInt(field.getAttribute('index'));
@@ -77,7 +78,7 @@ const game = (() => {
         i = Math.abs(i - 1);
         currentPlayer = playerAry[i];
         displayController.displayCurrentPlayer(currentPlayer);
-        if (currentPlayer === computer) {
+        if (currentPlayer.name === "computer") {
             setTimeout(() => { computerSelection(); }, 1000);
         }
     };

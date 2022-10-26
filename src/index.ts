@@ -18,10 +18,11 @@ const player = (name: string, marker: string) => {
 
 const game = (() => {
   let i = 0;
-  let currentPlayer = null;
-  let playerAry = null;
+  let currentPlayer: {
+    selectField(field: HTMLElement): unknown; marker: string; name: string; } = null;
+  let playerAry: any[] = null;
   let round = 1;
-  let difficulty = null;
+  let difficulty: string = null;
 
   const initializeGame = (player1name: string, player2name: string) => {
     playerAry = [player(player1name, 'x'), player(player2name, 'o')];
@@ -84,7 +85,7 @@ const game = (() => {
     i = Math.abs(i - 1);
     currentPlayer = playerAry[i];
     displayController.displayCurrentPlayer(currentPlayer);
-    if (currentPlayer === computer) {
+    if (currentPlayer.name === "computer") {
       setTimeout(() => { computerSelection(); }, 1000);
     }
   };
@@ -125,8 +126,8 @@ const computer = (() => {
   const center = 5;
   const corners = [1, 3, 7, 9];
   const sides = [2, 4, 6, 8];
-  let winningMoveIndex = null;
-  let blockMoveIndex = null;
+  let winningMoveIndex: number = null;
+  let blockMoveIndex: number = null;
 
   const selectField = (difficulty: string) => {
     switch (difficulty) {
