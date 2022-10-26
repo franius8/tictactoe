@@ -38,6 +38,10 @@ const game = (() => {
         });
     };
     const handleFieldSelection = (field) => {
+        if (currentPlayer.name === 'computer') {
+            return;
+        }
+        ;
         const isFinished = currentPlayer.selectField(field);
         if (isFinished === true) {
             if (gameBoard.isWon() === true) {
