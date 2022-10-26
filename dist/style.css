@@ -1,0 +1,192 @@
+:root {
+    --top-background-color: #cecece;
+    --shadow-color: #7a7a7a;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Bowlby One SC', cursive;
+    letter-spacing: 0.08rem;
+    word-spacing: 0.2rem;
+    font-size: 1.5rem;
+}
+
+h1 {
+    font-family: 'Alfa Slab One', cursive;
+    text-align: center;
+    font-size: 3rem;
+    background-color: var(--top-background-color);
+    margin: 0;
+    padding: 1rem;
+    box-shadow: 3px 3px 3px var(--shadow-color);
+}
+
+#content {
+    display: flex;
+    grid-template: 1fr / 1fr 1fr;
+    justify-content: center;
+    align-content: center;
+    height: 100%;
+}
+
+#container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+#display {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+#markerdiv {
+    height: 166px;
+    width: 166px;
+    background-color: var(--top-background-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 1rem;
+    border: 0.5rem solid var(--shadow-color);
+}
+
+#currentplayerdiv, #errordiv {
+    background-color: var(--top-background-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 1rem;
+    border: 0.5rem solid var(--shadow-color);
+    padding: 1rem;
+    width: 320px;
+    height: 20px;
+}
+
+#currentplayerlabel {
+    font-size: 1rem;
+}
+
+#errordiv {
+    visibility: collapse;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1rem;
+}
+
+form input {
+    padding: 1rem;
+    border-radius: 1rem;
+    border: 2px solid var(--top-background-color);
+    font-size: 1.5rem;
+    font-family: inherit;
+    word-spacing: inherit;
+    letter-spacing: inherit;
+}
+
+button {
+    padding: 1rem 2rem;
+    background-color: var(--top-background-color);
+    border: 1px solid var(--top-background-color);
+    border-radius: 1rem;
+    font-family: inherit;
+    font-size: 1.5rem;
+}
+
+button:hover {
+    background-color: var(--shadow-color);
+    border: 1px solid var(--shadow-color);
+    cursor: pointer;
+}
+
+#radiocontainer {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+#radiocontainer input[type="radio"] {
+    opacity: 0;
+    position: fixed;
+    width: 0;
+  }
+
+#radiocontainer label {
+    background-color: var(--top-background-color);
+    padding: 10px 20px;
+    border: 3px solid var(--top-background-color);
+    border-radius: 1rem;
+}
+
+#radiocontainer input[type="radio"]:checked + label {
+    background-color:var(--shadow-color);
+    border-color: var(--shadow-color);
+}
+
+#radiocontainer label:hover {
+    border: 3px solid var(--shadow-color);
+    cursor: pointer;
+  }
+
+#board {
+    background-color: var(--shadow-color);
+    height: 500px;
+    width: 500px;
+    border-radius: 1rem;
+    border: 0.5rem solid var(--shadow-color);
+    gap: 0.5rem;
+    grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+    overflow: hidden;
+    display: none;
+}
+
+.field {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--top-background-color);
+}
+
+.field:hover {
+    cursor: pointer;
+    background-color: #bdbdbd;
+}
+
+.o {
+    border-radius: 50%;
+    height: 100px;
+    width: 100px;
+    border: 10px solid black;
+}
+
+.x {
+    background: black;
+    height: 140px;
+    position: relative;
+    width: 10px;
+    transform: rotate(-45deg);
+  }
+
+.x:after {
+    background: black;
+    content: "";
+    height: 10px;
+    left: -65px;
+    position: absolute;
+    top: 65px;
+    width: 140px;
+  }
