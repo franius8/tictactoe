@@ -1,11 +1,10 @@
 {
   "compilerOptions": {
-    "outDir": "./built",
-    "allowJs": true,
-    "target": "es2015",
-    "noImplicitAny": true,
-    "alwaysStrict": true,
-    "noImplicitReturns": true
-  },
-  "include": ["./src/**/*"]
+      "target": "ES5",
+      "module": "ES2015",
+      "sourceMap": true,
+      "noImplicitAny": true,
+      "alwaysStrict": true,
+      "noImplicitReturns": true
+  }
 }
