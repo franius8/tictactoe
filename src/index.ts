@@ -402,17 +402,20 @@ const displayController = (() => {
   const addDisplayDivs = () => {
     const errorDiv = document.createElement('div');
     errorDiv.setAttribute('id', 'errordiv');
-    const currentPlayerDiv = document.createElement('div');
-    currentPlayerDiv.setAttribute('id', 'currentplayerdiv');
     const currentPlayerLabel = document.createElement('div');
     currentPlayerLabel.setAttribute('id', 'currentplayerlabel');
     currentPlayerLabel.textContent = 'Current player:';
+    const currentPlayerContainer = document.createElement('div');
+    currentPlayerContainer.setAttribute('id', 'currentplayercontainer');
+    const currentPlayerDiv = document.createElement('div');
+    currentPlayerDiv.setAttribute('id', 'currentplayerdiv');
     const markerDiv = document.createElement('div');
     markerDiv.setAttribute('id', 'markerdiv');
+    currentPlayerContainer.appendChild(currentPlayerDiv);
+    currentPlayerContainer.appendChild(markerDiv)
     display.appendChild(errorDiv);
     display.appendChild(currentPlayerLabel);
-    display.appendChild(currentPlayerDiv);
-    display.appendChild(markerDiv);
+    display.appendChild(currentPlayerContainer);
     displayResetButton();
   };
   const displayCurrentPlayer = (currentPlayer: { name: string; marker: string; }) => {
